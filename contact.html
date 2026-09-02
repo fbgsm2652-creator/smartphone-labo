@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact | Smartphone Labo</title>
+<meta name="description" content="Une question, une correction ou une proposition de sujet : écrivez-nous, chaque message reçoit une réponse.">
+<link rel="canonical" href="https://smartphone-labo.fr/contact">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Smartphone Labo">
+<meta property="og:title" content="Contact | Smartphone Labo">
+<meta property="og:description" content="Une question, une correction ou une proposition de sujet : écrivez-nous, chaque message reçoit une réponse.">
+<meta property="og:url" content="https://smartphone-labo.fr/contact">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="application/rss+xml" title="Smartphone Labo" href="/feed.xml">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap hbar">
+<a class="brand" href="/">Smartphone Labo<span>.</span></a>
+<nav class="main"><a href="/categorie/news/">News</a><a href="/categorie/samsung/">Samsung</a><a href="/categorie/smartphones/">Smartphones</a><a href="/categorie/trucs-et-astuces/">Trucs et astuces</a><a href="/categorie/apple/">Apple</a><a href="/categorie/pratiques/">Pratiques</a><a href="/partenaires">Partenaires</a><a href="/tous-les-articles">Tous les articles par marque et référence</a></nav>
+</div></header>
+<div class="wrap"><div class="legal">
+<h1>Nous contacter</h1>
+<p class="updated">Une question, une correction, une proposition : écrivez-nous.</p>
+
+<p>Vous avez repéré une erreur dans un article, vous souhaitez proposer un sujet, signaler un contenu ou
+poser une question technique sur une réparation ? Ce formulaire arrive directement dans notre boîte, et
+chaque message reçoit une réponse.</p>
+
+<p>Vous pouvez aussi écrire directement à <a href="mailto:contact@smartphone-labo.fr">contact@smartphone-labo.fr</a>.</p>
+
+<form class="form" id="cf" novalidate>
+  <div>
+    <label for="nom">Votre nom</label>
+    <input type="text" id="nom" name="nom" required maxlength="80" autocomplete="name">
+  </div>
+  <div>
+    <label for="email">Votre adresse e-mail</label>
+    <input type="email" id="email" name="email" required maxlength="120" autocomplete="email">
+    <p class="hint">Nécessaire pour vous répondre. Elle ne sert à rien d'autre.</p>
+  </div>
+  <div>
+    <label for="sujet">Sujet</label>
+    <select id="sujet" name="sujet">
+      <option>Question sur un article</option>
+      <option>Signaler une erreur</option>
+      <option>Proposer un sujet</option>
+      <option>Question technique / réparation</option>
+      <option>Signalement de contenu</option>
+      <option>Autre</option>
+    </select>
+  </div>
+  <div>
+    <label for="message">Votre message</label>
+    <textarea id="message" name="message" required maxlength="4000"></textarea>
+  </div>
+  <div style="position:absolute;left:-9999px" aria-hidden="true">
+    <label for="site">Ne pas remplir</label>
+    <input type="text" id="site" name="site" tabindex="-1" autocomplete="off">
+  </div>
+  <label class="consent">
+    <input type="checkbox" id="ok" name="ok" required>
+    <span>J'accepte que mon nom, mon adresse e-mail et mon message soient utilisés pour me répondre,
+    conformément à la <a href="/politique-de-confidentialite">politique de confidentialité</a>.</span>
+  </label>
+  <button class="btn" type="submit" id="sb">Envoyer le message</button>
+  <div class="form-msg" id="msg" role="status" aria-live="polite"></div>
+</form>
+
+<script>
+(function(){
+  var f=document.getElementById('cf'),b=document.getElementById('sb'),m=document.getElementById('msg');
+  function show(t,k){m.textContent=t;m.className='form-msg '+k;}
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!f.checkValidity()){show('Merci de remplir tous les champs obligatoires et de cocher la case.','err');return;}
+    b.disabled=true;b.textContent='Envoi en cours...';show('','');
+    var d={};new FormData(f).forEach(function(v,k){d[k]=v;});
+    fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
+      .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+      .then(function(res){
+        if(res.ok){f.reset();show('Message envoyé. Merci, nous vous répondons rapidement.','ok');}
+        else{show((res.j&&res.j.error)||"L'envoi a échoué. Réessayez ou écrivez-nous directement par e-mail.",'err');}
+      })
+      .catch(function(){show("L'envoi a échoué. Vérifiez votre connexion, ou écrivez-nous directement par e-mail.",'err');})
+      .then(function(){b.disabled=false;b.textContent='Envoyer le message';});
+  });
+})();
+</script>
+
+<h2>Autres informations</h2>
+<p>Les coordonnées complètes de l'éditeur figurent dans les
+<a href="/mentions-legales">mentions légales</a>. Le traitement de vos données est décrit dans la
+<a href="/politique-de-confidentialite">politique de confidentialité</a>.</p>
+</div></div>
+<footer class="site"><div class="wrap">
+<div class="fcols">
+<div><h3>Smartphone Labo</h3><p style="font-size:14px">Blog dédié aux mobiles et Smartphones ainsi qu&#x27;aux nouvelles technologies. Smartphone Labo traite différents sujets et thématiques liés à la High Tech</p></div>
+<div><h3>Explorer</h3><a href="/categorie/news/">News</a><a href="/categorie/samsung/">Samsung</a><a href="/categorie/smartphones/">Smartphones</a><a href="/categorie/trucs-et-astuces/">Trucs et astuces</a><a href="/categorie/apple/">Apple</a></div>
+<div><h3>Archives</h3><a href="/archives/2026/">2026</a><a href="/archives/2025/">2025</a><a href="/archives/2024/">2024</a><a href="/archives/2023/">2023</a><a href="/archives/2022/">2022</a><a href="/archives/2021/">2021</a></div>
+</div>
+<div style="border-top:1px solid var(--line);padding-top:18px;font-size:13.5px">&copy; 2026 Smartphone Labo — Tous droits réservés &middot; <a href="/plan-du-site">Plan du site</a> &middot; <a href="/feed.xml">RSS</a></div>
+</div></footer>
+</body></html>

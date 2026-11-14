@@ -50,6 +50,7 @@ chaque message reçoit une réponse.</p>
       <option>Question sur un article</option>
       <option>Signaler une erreur</option>
       <option>Proposer un sujet</option>
+      <option>Article sponsorisé / partenariat</option>
       <option>Question technique / réparation</option>
       <option>Signalement de contenu</option>
       <option>Autre</option>
@@ -68,10 +69,22 @@ chaque message reçoit une réponse.</p>
     <span>J'accepte que mon nom, mon adresse e-mail et mon message soient utilisés pour me répondre,
     conformément à la <a href="/politique-de-confidentialite">politique de confidentialité</a>.</span>
   </label>
+  <div id="ts" style="margin:4px 0 12px"></div>
   <button class="btn" type="submit" id="sb">Envoyer le message</button>
   <div class="form-msg" id="msg" role="status" aria-live="polite"></div>
 </form>
 
+<script>
+/* Vérification anti-robot Cloudflare Turnstile.
+   Tant que la clé n'est pas renseignée, le formulaire fonctionne sans elle. */
+var TS_SITEKEY='A_REMPLACER';
+function tsReady(){ if(window.turnstile) turnstile.render('#ts',{sitekey:TS_SITEKEY,language:'fr'}); }
+if(TS_SITEKEY!=='A_REMPLACER'){
+  var s=document.createElement('script');
+  s.src='https://challenges.cloudflare.com/turnstile/v0/api.js?onload=tsReady&render=explicit';
+  s.async=true; s.defer=true; document.head.appendChild(s);
+}
+</script>
 <script>
 (function(){
   var f=document.getElementById('cf'),b=document.getElementById('sb'),m=document.getElementById('msg');
@@ -84,6 +97,7 @@ chaque message reçoit une réponse.</p>
     fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
       .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
       .then(function(res){
+        if(window.turnstile)turnstile.reset('#ts');
         if(res.ok){f.reset();show('Message envoyé. Merci, nous vous répondons rapidement.','ok');}
         else{show((res.j&&res.j.error)||"L'envoi a échoué. Réessayez ou écrivez-nous directement par e-mail.",'err');}
       })

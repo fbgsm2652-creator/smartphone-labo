@@ -7,6 +7,8 @@
  *                  ex. : premiere@gmail.com,deuxieme@gmail.com
  *   CONTACT_FROM   adresse expéditrice authentifiée chez Brevo (contact@domaine)
  *   SITE_NAME      nom du blog, affiché dans l'objet du message
+ *   TURNSTILE_SECRET  clé secrète Cloudflare Turnstile (type Secret). Si elle est
+ *                  absente, la vérification anti-robot est simplement ignorée.
  *
  * Aucune donnée n'est stockée : le message est relayé puis oublié.
  * Chaque destinataire reçoit son propre exemplaire : si une boîte bloque ou
@@ -36,6 +38,31 @@ export async function onRequestPost({ request, env }) {
 
   // Piège à robots : champ invisible qui doit rester vide.
   if (d.site) return json({ ok: true });
+
+  // Vérification anti-robot Cloudflare Turnstile.
+  if (env.TURNSTILE_SECRET) {
+    const token = (d["cf-turnstile-response"] || "").toString();
+    if (!token)
+      return json({ error: "Merci de patienter pendant la vérification anti-robot, puis de renvoyer." }, 400);
+    const form = new FormData();
+    form.append("secret", env.TURNSTILE_SECRET);
+    form.append("response", token);
+    const ipv = request.headers.get("cf-connecting-ip");
+    if (ipv) form.append("remoteip", ipv);
+    let valid = false;
+    try {
+      const v = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+        method: "POST",
+        body: form,
+      });
+      valid = (await v.json()).success === true;
+    } catch (e) {
+      console.log(`Turnstile injoignable : ${e}`);
+      valid = true; // ne pas perdre un vrai message si Cloudflare a un souci passager
+    }
+    if (!valid)
+      return json({ error: "La vérification anti-robot a échoué. Rechargez la page et réessayez." }, 403);
+  }
 
   const nom = (d.nom || "").toString().trim().slice(0, 80);
   const email = (d.email || "").toString().trim().slice(0, 120);
